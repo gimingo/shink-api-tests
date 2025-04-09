@@ -1,7 +1,18 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+
+	"gimingo/shink-api-tests/endpoints"
+)
 
 func main() {
-    fmt.Println("Hello, World!")
+	token := endpoints.GetAuthToken()
+	hash, err := endpoints.BookShinkHash(token)
+	if err != nil {
+		log.Fatalf("Error booking shink hash: %v", err)
+	}
+  
+  fmt.Printf("Hash booked: %s\n", hash)
 }
