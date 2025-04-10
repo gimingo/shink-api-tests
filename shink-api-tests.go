@@ -9,35 +9,37 @@ import (
 	"gimingo/shink-api-tests/endpoints"
 )
 
-func bookAndCreateHashUntilQuoteLimitReached(token string) {
-	quotaLimit := 100
-	bookedHashes := 0
-	createdShinks := 0
+func main() {
+	token, err := endpoints.GetAuthToken()
+  if err != nil {
+    log.Printf("Error creating user") 
+  } 
 
-	for i := 1; i <= quotaLimit; i++ {
+	bookAndCreateHashUntilQuoteLimitReached(token)
+}
+
+func bookAndCreateHashUntilQuoteLimitReached(token string) {
+  numberOfShinks := 110
+
+	for i := 1; i <= numberOfShinks; i++ {
+    bookAndCreateShink(token, i);
+		printProgressBar(i, numberOfShinks)
+	}
+
+	fmt.Println()
+  log.Printf("Successfully booked %d hashes and created %d shinks!", numberOfShinks, numberOfShinks)
+}
+
+func bookAndCreateShink(token string, i int) {
 		hash, err := endpoints.BookShinkHash(token)
 		if err != nil {
 			log.Fatalf("Iteration %d: Error booking shink hash: %v", i, err)
 		}
-		bookedHashes++
 
 		_, err = endpoints.CreateShink(token, "shink-"+strconv.Itoa(i), "https://example.com", hash)
 		if err != nil {
 			log.Printf("Iteration %d: Error creating shink: %v", i, err)
-		} else {
-			createdShinks++
-		}
-
-		printProgressBar(i, quotaLimit)
-	}
-
-	fmt.Println()
-	log.Printf("Successfully booked %d hashes and created %d shinks!", bookedHashes, createdShinks)
-}
-
-func main() {
-	token := endpoints.GetAuthToken()
-	bookAndCreateHashUntilQuoteLimitReached(token)
+    }
 }
 
 func printProgressBar(current, total int) {
